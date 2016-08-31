@@ -2,7 +2,9 @@
     "name": "rabbitcms/templates",
     "description": "Mail templates for RabbitCMS",
     "require": {
-        "rabbitcms/modules": "0.1.7.1"
+        "twig/twig": "^1.24",
+        "twig/extensions": "^1.3",
+        "rabbitcms/modules": "^0.1.7"
     },
     "license": "MIT",
     "authors": [
