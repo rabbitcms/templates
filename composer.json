@@ -1,0 +1,28 @@
+{
+    "name": "rabbitcms/templates",
+    "description": "Mail templates for RabbitCMS",
+    "require": {
+        "rabbitcms/modules": "0.1.7.1"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Dmytro Kulyk",
+            "email": "lnkvisitor.ts@gmail.com"
+        }
+    ],
+    "autoload": {
+        "classmap": [
+            "Database"
+        ],
+        "psr-4": {
+            "RabbitCMS\\Templates\\": "./"
+        }
+    },
+    "extra": {
+        "module": {
+            "providers": "RabbitCMS\\Templates\\Providers\\TemplatesModuleProvider",
+            "system": true
+        }
+    }
+}
