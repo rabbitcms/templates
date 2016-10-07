@@ -1,72 +1,61 @@
 <?php
+
 use Illuminate\Routing\Router;
 use RabbitCMS\Backend\Support\Backend;
 
 return [
-    'boot' => function (Backend $backend) {
+    'boot'      => function (Backend $backend) {
         $backend->addMenuResolver(
             function (Backend $backend) {
-                $backend->addMenu(
-                    'system',
-                    'templates',
-                    trans('templates::common.Templates'),
-                    null,
-                    'fa fa-newspaper-o',
-                    null,
-                    40
-                );
-
-                $backend->addMenu(
-                    'system.templates',
-                    'edit',
-                    trans('templates::common.Manage'),
-                    route('backend.templates.index'),
-                    'fa fa-newspaper-o',
-                    ['templates.edit'],
-                    1
-                );
-//                $backend->addMenu(
-//                    'system.templates',
-//                    'edit',
-//                    trans('templates::common.Manage'),
-//                    route('backend.templates.history.index'),
-//                    'fa fa-newspaper-o',
-//                    ['templates.story'],
-//                    2
-//                );
+                $backend->addMenu('system', 'templates', trans('templates::menu.templates'), route('backend.templates.index'), 'fa-angle-double-right', ['templates.read'], 40);
             }
         );
         $backend->addAclResolver(
             function (Backend $backend) {
-                $backend->addAclGroup('templates', trans('templates::common.Templates'));
-                $backend->addAcl('templates', 'edit', trans('templates::common.AclTemplates'));
-                $backend->addAcl('templates', 'history', trans('templates::common.AclHistory'));
+                $backend->addAclGroup('templates', trans('templates::acl.templates'));
+                $backend->addAcl('templates', 'create', trans('templates::acl.create'));
+                $backend->addAcl('templates', 'read', trans('templates::acl.read'));
+                $backend->addAcl('templates', 'update', trans('templates::acl.update'));
+                $backend->addAcl('templates', 'write', trans('templates::acl.write'));
             }
         );
     },
-    'routes' => function (Router $router) {
-        $router->post('grid', ['uses' => 'TemplateController@grid', 'as' => 'grid']);
+    'routes'    => function (Router $router) {
         $router->get('', ['uses' => 'TemplateController@index', 'as' => 'index']);
-        $router->post('', ['uses' => 'TemplateController@store', 'as' => 'store']);
+        $router->post('', ['uses' => 'TemplateController@grid', 'as' => 'grid']);
+
         $router->get('create', ['uses' => 'TemplateController@create', 'as' => 'create']);
-        $router->put('{id}', ['uses' => 'TemplateController@update', 'as' => 'update']);
-        $router->get('{id}', ['uses' => 'TemplateController@edit', 'as' => 'edit']);
-        $router->delete('{id}', ['uses' => 'TemplateController@destroy', 'as' => 'delete']);
+        $router->post('create', ['uses' => 'TemplateController@store', 'as' => 'store']);
+
+        $router->get('edit/{id}', ['uses' => 'TemplateController@edit', 'as' => 'edit']);
+        $router->post('edit/{id}', ['uses' => 'TemplateController@update', 'as' => 'update']);
+
+        $router->post('delete/{id}', ['uses' => 'TemplateController@destroy', 'as' => 'delete']);
     },
     'requirejs' => [
         'packages' => [
             'rabbitcms/templates' => [
                 'location' => 'js',
-                'main' => 'templates'
-            ]
+                'main'     => 'templates',
+            ],
         ],
     ],
-    'handlers' => [
+    'handlers'  => [
         '' => [
-            'module' => 'rabbitcms/templates',
-            'exec' => 'table',
+            'module'    => 'rabbitcms/templates',
+            'exec'      => 'table',
             'permanent' => true,
-            'menuPath' => 'system.templates.edit',
+            'menuPath'  => 'system.templates',
         ],
-    ]
+        'create' => [
+            'module'    => 'rabbitcms/templates',
+            'exec'      => 'form',
+            'menuPath'  => 'system.templates',
+        ],
+        'edit\/(\d+)' => [
+            'module'    => 'rabbitcms/templates',
+            'exec'      => 'form',
+            'menuPath'  => 'system.templates',
+        ]
+    ],
 ];

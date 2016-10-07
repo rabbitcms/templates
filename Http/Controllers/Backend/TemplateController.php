@@ -2,205 +2,168 @@
 
 namespace RabbitCMS\Templates\Http\Controllers\Backend;
 
-use Illuminate\Http\RedirectResponse;
+
+use ABC\Modules\Common\Entities\Localization as LocalizationEntity;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\Factory;
 use Illuminate\View\View;
 use RabbitCMS\Backend\Annotation\Permissions;
 use RabbitCMS\Backend\Http\Controllers\Backend\Controller;
 use RabbitCMS\Templates\DataProviders\TemplateDataProvider;
-use RabbitCMS\Templates\Entities\Template;
-use RabbitCMS\Templates\Http\Requests\StoreTemplateRequest;
-
+use RabbitCMS\Templates\Entities\Template as TemplateEntity;
+use RabbitCMS\Templates\Http\Requests\TemplateRequest;
 
 /**
  * Class TemplateController
- *
- * @Permissions("templates.edit")
+ * @Permissions("templates.read")
  */
 class TemplateController extends Controller
 {
     protected $module = 'templates';
-    /**
-     * @param Factory $view
-     */
-    public function before(Factory $view)
-    {
-        $view->composer([
-            $this->viewName('templates.index'),
-            $this->viewName('templates.edit')
-        ], function (View $view) {
-            $view->with('locales', Template::query()->distinct()->pluck('locale'));
-        });
-    }
 
     /**
-     * Show templates table.
-     *
-     * @return View
+     * @param Factory $factory
      */
-    public function index()
+    public function before(Factory $factory)
     {
-        return $this->view('templates.index', [
-            'names' => Template::query()->distinct()->pluck('name'),
-        ]);
-    }
-
-    /**
-     * Show template info.
-     *
-     * @param int $id
-     *
-     * @return RedirectResponse|View
-     */
-    public function show($id)
-    {
-        /* @var Template $template */
-        $template = Template::query()->findOrFail($id);
-
-        return $this->view('templates.edit', compact($template));
-    }
-
-    /**
-     * Grid data action.
-     *
-     * @param \Illuminate\Http\Request $request
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function grid(Request $request)
-    {
-        return (new TemplateDataProvider())->response($request);
-//        $grid = new Grid(
-//            new Template(),
-//            function (Template $template) {
-//                $data = $template->attributesToArray();
-//                $data['actions'] = [
-//                    'show' => route('templates.templates.show', ['templates' => $template->id]),
-//                    'edit' => route('templates.templates.edit', ['templates' => $template->id]),
-//                    'delete' => route('templates.templates.destroy', ['templates' => $template->id])
-//                ];
-//                return $data;
-//            },
-//            function (EloquentBuilder $query, array $filters) {
-//                if (array_key_exists('name', $filters) && $filters['name'] != '') {
-//                    $query->where('name', $filters['name']);
-//                }
-//                if (array_key_exists('locale', $filters) && $filters['locale'] != '') {
-//                    $query->where('locale', $filters['locale']);
-//                }
-//                if (array_key_exists('subject', $filters) && $filters['subject'] != '') {
-//                    $query->where('subject', 'like', '%' . $filters['subject'] . '%');
-//                }
-//            }
-//        );
-
-//        return $grid->response($request);
-    }
-
-    /**
-     * Show create form action.
-     *
-     * @return \Illuminate\View\View
-     * @Permissions("other.templates.write")
-     */
-    public function create()
-    {
-        return view(
-            'templates::templates.edit',
+        $factory->composer(
             [
-                'template' => new Template(),
-                'names' => Template::query()->distinct()->pluck('name'),
-            ]
-        );
-    }
+                $this->viewName('templates.index'),
+                $this->viewName('templates.form'),
+            ],
+            function (View $view) {
+                $locales = LocalizationEntity::query()
+                    ->where('enabled', '=', 1)
+                    ->get(['caption', 'locale']);
 
-    /**
-     * Store action.
-     *
-     * @param StoreTemplateRequest $request
-     *
-     * @return RedirectResponse
-     * @Permissions("other.templates.write")
-     */
-    public function store(StoreTemplateRequest $request)
-    {
-        $this->saveTemplate(new Template(), $request);
-
-        return \Redirect::route('templates.templates.index')->withErrors(['access' => trans('templates::common.success')],
-            'info');
-    }
-
-    /**
-     * Save template data.
-     *
-     * @param Template $template
-     * @param Request $request
-     *
-     * @throws \Exception
-     * @throws \Throwable
-     * @return void
-     * @Permissions("other.templates.write")
-     */
-    protected function saveTemplate(Template $template, Request $request)
-    {
-        $template->getConnection()->transaction(
-            function () use ($template, $request) {
-                $data = $request->only(/*$template->getFillable()*/
-                    ['name', 'locale', 'subject', 'template']);
-                $template->fill($data);
-                $template->save();
+                $view->with('locales', $locales);
             }
         );
     }
 
     /**
-     * Update user action.
+     * Templates table.
      *
-     * @param int $id
-     * @param UserStoreRequest $request
-     *
-     * @return RedirectResponse
-     * @Permissions("other.templates.write")
+     * @return View
      */
-    public function update($id, StoreTemplateRequest $request)
+    public function index()
     {
-        /* @var Template $template */
-        $template = Template::query()->find($id);
-
-        if ($template === null) {
-            return \Redirect::route('templates.templates.index')->withErrors([trans('templates::templates.NotFound')],
-                'errors');
-        }
-
-        $this->saveTemplate($template, $request);
-
-        return \Redirect::route('templates.templates.index')->withErrors(['access' => trans('templates::common.success')],
-            'info');
+        return $this->view('templates.index');
     }
 
     /**
-     * Delete template action.
+     * Templates table data.
      *
-     * @param int $id
+     * @param Request $request
      *
-     * @return RedirectResponse
-     * @throws \Exception
-     * @Permissions("other.templates.write")
+     * @return JsonResponse
      */
-    public function destroy($id)
+    public function grid(Request $request)
     {
-        /* @var Template $template */
-        $template = Template::query()->find($id);
+        return (new TemplateDataProvider)->response($request);
+    }
 
-        if ($template === null) {
-            return \Redirect::route('templates.templates.index')->withErrors([trans('templates::templates.NotFound')],
-                'errors');
-        }
+    /**
+     * Template create form.
+     *
+     * @return View
+     * @Permissions("templates.create")
+     */
+    public function create()
+    {
+        $template = new TemplateEntity;
 
-        $template->delete();
+        $extends = TemplateEntity::query()
+            ->select('name')
+            ->whereNull('extends')
+            ->distinct()
+            ->get();
 
-        return \Redirect::route('templates.templates.index')->withErrors(['access' => trans('templates::common.success')],
-            'info');
+        return $this->view('templates.form', compact('template', 'extends'));
+    }
+
+    /**
+     * Template create action.
+     *
+     * @param TemplateRequest $request
+     * @Permissions("templates.create")
+     */
+    public function store(TemplateRequest $request)
+    {
+        $template = new TemplateEntity;
+
+        return $this->save($template, $request);
+    }
+
+    /**
+     * Template update form.
+     *
+     * @param $id
+     *
+     * @return View
+     */
+    public function edit($id)
+    {
+        /* @var TemplateEntity $template */
+        $template = TemplateEntity::query()
+            ->findOrFail($id);
+
+        $extends = TemplateEntity::query()
+            ->select('name')
+            ->whereNull('extends')
+            ->where('name', '<>', $template->name)
+            ->distinct()
+            ->get();
+
+        return $this->view('templates.form', compact('template', 'extends'));
+    }
+
+    /**
+     * Template Update action.
+     *
+     * @param                 $id
+     * @param TemplateRequest $request
+     * @Permissions("templates.update")
+     */
+    public function update($id, TemplateRequest $request)
+    {
+        /* @var TemplateEntity $template */
+        $template = TemplateEntity::query()
+            ->findOrFail($id);
+
+        return $this->save($template, $request);
+    }
+
+    /**
+     * Template delete action.
+     *
+     * @param $id
+     * @Permissions("templates.delete")
+     */
+    public function delete($id)
+    {
+        TemplateEntity::query()
+            ->findOrFail($id)
+            ->delete();
+    }
+
+    /**
+     * Template save action.
+     *
+     * @param TemplateEntity  $template
+     * @param TemplateRequest $request
+     *
+     * @return void
+     */
+    protected function save(TemplateEntity $template, TemplateRequest $request)
+    {
+        $data = $request->only(['name', 'locale', 'subject', 'plain', 'enabled', 'template']);
+
+        $extends = $request->input('extends');
+        $data['extends'] = $extends !== '' ? $extends : null;
+
+        $template->fill($data);
+        $template->save();
     }
 }
