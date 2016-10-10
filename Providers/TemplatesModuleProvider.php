@@ -4,8 +4,6 @@ namespace RabbitCMS\Templates\Providers;
 
 use RabbitCMS\Modules\ModuleProvider;
 use RabbitCMS\Templates\Templates;
-use RabbitCMS\Templates\Twig\TokenParser\MailContent;
-use Twig_Environment;
 
 class TemplatesModuleProvider extends ModuleProvider
 {
@@ -13,14 +11,15 @@ class TemplatesModuleProvider extends ModuleProvider
     {
         parent::register();
 
-        $this->app->singleton('templates', function () {
-            return new Templates(
-                $this->app->make('mailer')
-            );
-        });
+        $this->app->singleton(
+            [Templates::class => 'templates'],
+            function () {
+                return new Templates(
+                    $this->app->make('mailer')
+                );
+            }
+        );
     }
-
-
 
     /**
      * @inheritdoc
