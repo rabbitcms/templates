@@ -17,9 +17,9 @@ class CreateMailSendTable extends Migration
                 $table->morphs('recipient');
                 $table->unsignedInteger('template_id');
                 $table->string('subject');
-                $table->text('html');
-                $table->text('plain');
-                $table->text('callback');
+                $table->text('html')->nullable();
+                $table->text('plain')->nullable();
+                $table->text('callback')->nullable();
                 $table->boolean('sent');
                 $table->timestamps();
 
