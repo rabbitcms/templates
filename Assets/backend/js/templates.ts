@@ -1,4 +1,4 @@
-/// <reference path="../../../../../backend/Assets/backend/dt/index.d.ts" />
+/// <reference path="../../../../backend/Assets/backend/dt/index.d.ts" />
 
 import * as $ from "jquery";
 import {DataTable} from "rabbitcms/datatable";

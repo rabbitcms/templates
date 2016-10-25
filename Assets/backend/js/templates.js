@@ -1,3 +1,4 @@
+/// <reference path="../../../../backend/Assets/backend/dt/index.d.ts" />
 define(["require", "exports", "jquery", "rabbitcms/datatable", "rabbitcms/backend", "rabbitcms/form", "tinymce/tinymce.min"], function (require, exports, $, datatable_1, backend_1, form_1) {
     "use strict";
     var Templates = (function (_super) {
