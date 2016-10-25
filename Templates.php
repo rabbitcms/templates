@@ -61,7 +61,7 @@ class Templates
         $send->recipient()->associate($recipient);
 
         $send->save();
-        return new SendMail($send,$callback);
+        return new SendMail($send);
     }
 
     /**
