@@ -11,20 +11,17 @@ class TemplatesModuleProvider extends ModuleProvider
     {
         parent::register();
 
-        $this->app->singleton(
-            [Templates::class => 'templates'],
-            function () {
-                return new Templates(
-                    $this->app->make('mailer')
-                );
-            }
-        );
+        $this->app->singleton([Templates::class => 'templates'], function () {
+            return new Templates(
+                $this->app->make('mailer')
+            );
+        });
     }
 
     /**
      * @inheritdoc
      */
-    protected function name()
+    protected function name(): string
     {
         return 'templates';
     }
