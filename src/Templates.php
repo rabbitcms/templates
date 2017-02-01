@@ -4,7 +4,7 @@ namespace RabbitCMS\Templates;
 
 use DateTime;
 use Illuminate\Foundation\Bus\DispatchesJobs;
-use RabbitCMS\Templates\Contracts\MailRecipient;
+use RabbitCMS\Contracts\Templates\MailRecipient;
 use RabbitCMS\Templates\Entities\Send;
 use RabbitCMS\Templates\Jobs\SendMail;
 use RabbitCMS\Templates\Twig\MailLoader;

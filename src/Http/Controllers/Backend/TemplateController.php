@@ -3,7 +3,7 @@
 namespace RabbitCMS\Templates\Http\Controllers\Backend;
 
 
-use ABC\Modules\Common\Entities\Localization as LocalizationEntity;
+use B2B\TCA\Core\Entities; //todo WTF?
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\Factory;
@@ -33,7 +33,7 @@ class TemplateController extends Controller
                 $this->viewName('templates.form'),
             ],
             function (View $view) {
-                $locales = LocalizationEntity::query()
+                $locales = Entities\Localization::query()
                     ->where('enabled', '=', 1)
                     ->get(['caption', 'locale']);
 

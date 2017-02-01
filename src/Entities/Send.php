@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Str;
-use RabbitCMS\Templates\Contracts\MailRecipient;
+use RabbitCMS\Contracts\Templates\MailRecipient;
 use SuperClosure\Serializer;
 
 /**
