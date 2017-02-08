@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 namespace RabbitCMS\Templates;
 
 use DateTime;
@@ -11,6 +11,11 @@ use RabbitCMS\Templates\Twig\MailLoader;
 use RabbitCMS\Templates\Twig\TokenParser\MailContent;
 use Twig_Environment;
 
+/**
+ * Class Templates
+ *
+ * @package RabbitCMS\Templates
+ */
 class Templates
 {
     use DispatchesJobs;
@@ -19,6 +24,9 @@ class Templates
 
     protected $loader;
 
+    /**
+     * Templates constructor.
+     */
     public function __construct()
     {
         $this->loader = new MailLoader;
