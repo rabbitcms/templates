@@ -7,6 +7,7 @@ use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Mail\Mailable as IlluminateMailable;
 use Illuminate\Mail\Message;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\App;
 
 /**
  * Class Mailable
@@ -17,6 +18,16 @@ abstract class Mailable extends IlluminateMailable
 {
     use SerializesModels;
 
+    protected $locale;
+
+    /**
+     * Mailable constructor.
+     */
+    public function __construct()
+    {
+        $this->locale = App::getLocale();
+    }
+
     public function build()
     {
     }
@@ -26,6 +37,11 @@ abstract class Mailable extends IlluminateMailable
      */
     public function send(MailerContract $mailer)
     {
+        $locale = App::getLocale();
+        if ($this->locale !== null) {
+            App::setLocale($this->locale);
+        }
+
         Container::getInstance()->call([$this, 'build']);
 
         $mailer->raw('', function (Message $message) {
@@ -43,6 +59,7 @@ abstract class Mailable extends IlluminateMailable
             $message->getSwiftMessage()
                 ->addPart($view['text'], 'text/plain');
         });
+        App::setLocale($locale);
     }
 
     /**
