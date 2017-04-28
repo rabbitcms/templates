@@ -16,34 +16,24 @@ class MailLoader implements Twig_LoaderInterface
     protected $cache = [];
 
     /**
-     * Gets the cache key to use for the cache for a given template name.
-     *
-     * @param string $name The name of the template to load
-     *
-     * @return string The cache key
-     * @throws Twig_Error_Loader When $name is not found
+     * @inheritdoc
      */
     public function getCacheKey($name)
     {
-        return $this->getSource($name);
+        return $name;
     }
 
     /**
-     * Gets the source code of a template, given its name.
-     *
-     * @param string $name The name of the template to load
-     *
-     * @return string The template source code
-     * @throws Twig_Error_Loader When $name is not found
+     * @inheritdoc
      */
-    public function getSource($name)
+    public function getSourceContext($name)
     {
         $names = $this->getNames($name);
         $template = $this->findTemplate($name);
 
         switch ($names[0]) {
             case 'subject':
-                return $template->subject;
+                return new \Twig_Source($template->subject, $name);
             case 'plain':
                 $body = $template->plain;
                 break;
@@ -55,7 +45,7 @@ class MailLoader implements Twig_LoaderInterface
             $body = "{% extends \"{$template->extends}\" %}{% block content%}{$body}{% endblock %}";
         }
 
-        return $body;
+        return new \Twig_Source($body, $name);
     }
 
     /**
@@ -87,10 +77,12 @@ class MailLoader implements Twig_LoaderInterface
 
         $query = Template::query();
         $locales = [Lang::getLocale(), Lang::getFallback()];
+
         /* @var Template $template */
         $template = $query->whereIn('locale', $locales)
             ->where('name', $name)
             ->orderByRaw('locale = ? desc', [$locales[0]])->first();
+
         if ($template === null) {
             throw new Twig_Error_Loader(
                 sprintf('Unable to find template "%s" (looked for locales: %s).', $name, implode(', ', $locales))
@@ -113,6 +105,19 @@ class MailLoader implements Twig_LoaderInterface
     public function isFresh($name, $time)
     {
         $updated = $this->findTemplate($name)->updated_at;
-        return !$updated || $updated->timestamp  > $time;
+        return $updated && $updated->timestamp  > $time;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function exists($name)
+    {
+        try {
+            $this->findTemplate($name);
+            return true;
+        } catch (Twig_Error_Loader $e) {
+            return false;
+        }
     }
 }
