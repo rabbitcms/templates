@@ -105,7 +105,7 @@ class MailLoader implements Twig_LoaderInterface
     public function isFresh($name, $time)
     {
         $updated = $this->findTemplate($name)->updated_at;
-        return $updated && $updated->timestamp  > $time;
+        return $updated && $updated->timestamp <= $time;
     }
 
     /**
