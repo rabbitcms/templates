@@ -72,12 +72,32 @@ abstract class Mailable extends IlluminateMailable
         $template = $this->getTemplate();
         $data = $this->buildViewData();
 
-        $this->subject($engine->render("subject:$template", $data));
-
         return [
             'html'  => $engine->render("html:$template", $data),
             'text' => $engine->render("plain:$template", $data),
         ];
+    }
+
+    /**
+     * Set the subject for the message.
+     *
+     * @param  \Illuminate\Mail\Message  $message
+     * @return $this
+     */
+    protected function buildSubject($message)
+    {
+        if ($this->subject) {
+            $message->subject($this->subject);
+        } else {
+            $engine = Container::getInstance()->make(Templates::class)->getEngine();
+
+            $template = $this->getTemplate();
+            $data = $this->buildViewData();
+
+            $message->subject($engine->render("subject:$template", $data));
+        }
+
+        return $this;
     }
 
     /**
