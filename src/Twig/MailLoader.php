@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace RabbitCMS\Templates\Twig;
 
@@ -7,6 +8,11 @@ use RabbitCMS\Templates\Entities\Template;
 use Twig_Error_Loader;
 use Twig_LoaderInterface;
 
+/**
+ * Class MailLoader
+ *
+ * @package RabbitCMS\Templates\Twig
+ */
 class MailLoader implements Twig_LoaderInterface
 {
     /**
@@ -20,7 +26,7 @@ class MailLoader implements Twig_LoaderInterface
      */
     public function getCacheKey($name)
     {
-        return $name;
+        return $name . '_' . Lang::getLocale();
     }
 
     /**
